@@ -7,7 +7,7 @@
 
 #include "../../drivers/DisplayDriver.h"
 #include "../../HW.h"
-#include "../../../lib/Adafruit-ST7735-Library/Adafruit_ST7735.h"
+#include "Adafruit_ST7735.h"
 
 class ST7735 : DisplayDriver {
 public:
