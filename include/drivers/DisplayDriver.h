@@ -5,19 +5,21 @@
 #ifndef LWOS_DISPLAYDRIVER_H
 #define LWOS_DISPLAYDRIVER_H
 
-#include <stdint.h>
+#include <cstdint>
+#include "Driver.h"
 
-typedef uint16_t color;
+typedef uint32_t color;
 
-class DisplayDriver {
+class DisplayDriver : public Driver {
 
 public:
+    virtual void init(void *) {};
 
-    virtual void drawPixel(int x, int y, color c) = 0;
+    virtual void drawPixel(int x, int y, color c) {};
 
-    virtual int getWidth() const = 0;
+    virtual int getWidth() { return 0; };
 
-    virtual int getHeight() const = 0;
+    virtual int getHeight() { return 0; };
 
 private:
 

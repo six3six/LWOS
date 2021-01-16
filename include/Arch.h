@@ -7,12 +7,15 @@
 
 #ifdef ESP32
 
-#include "arch/esp32/ST7735.h"
+#include "drivers/arduino/ST7735.h"
+#include "drivers/arduino/ArduinoSerial.h"
+#include "drivers/arduino/ArduinoButton.h"
 
 #endif
 #ifdef x86
 
-#include "arch/x86/SDL2.h"
+#include "drivers/SDL2.h"
+#include "drivers/Console.h"
 
 #endif
 

@@ -4,6 +4,8 @@
 
 #if HW == LBAN
 #include "hw/LBAND.h"
+#elif HW == x86
+#include "hw/x86.h"
 #else
 #include "hw/common.h"
 #endif

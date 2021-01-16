@@ -2,6 +2,9 @@
 // Created by ldesp on 10/01/2021.
 //
 
+#include "WString.h"
+
+
 #define TP_PIN_PIN          33
 #define TP_PWR_PIN          25
 
@@ -29,11 +32,5 @@
 #define VBUS_ADC_PIN        36
 #define CHARGE_PIN          32
 
-
-#define TFT_MISO NULL
-#define TFT_MOSI 19
-#define TFT_SCLK 18
-#define TFT_CS 05
-#define TFT_DC 23
-#define TFT_RST 26
-#define TFT_BL 27
+#define SCREEN_WIDTH 160
+#define SCREEN_HEIGHT 80

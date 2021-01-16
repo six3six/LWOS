@@ -2,8 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/lib/Adafruit-GFX-Library" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/lib/Adafruit-ST7735-Library" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/lib/Adafruit_BusIO" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/TFT_eSPI" vcs="Git" />
   </component>
 </project>
