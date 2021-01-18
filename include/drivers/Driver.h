@@ -5,12 +5,12 @@
 #ifndef LWOS_DRIVER_H
 #define LWOS_DRIVER_H
 
+#include "FreeRTOS.h"
+
 class Driver {
 public:
-    static void Run() {};
 
 private:
-    static void loop(void *param) {};
 };
 
 #endif //LWOS_DRIVER_H

@@ -11,6 +11,7 @@
 
 class UILib : Lib {
 public:
+    static void initDrivers();
 
     static void DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color);
     static void DrawString(int32_t x, int32_t y, const char* text);

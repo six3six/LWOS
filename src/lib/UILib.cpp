@@ -46,3 +46,7 @@ void UILib::DrawString(int32_t x, int32_t y, const char *text) {
     ST7735Frame frame{ST7735Command::String, coordSize, (byte *) coord};
     xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
 }
+
+void UILib::initDrivers() {
+    ST7735::Run();
+}

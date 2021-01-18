@@ -9,11 +9,11 @@ QueueHandle_t ST7735::getQueue() {
 }
 
 void ST7735::Run() {
-    ST7735::queueHandle = xQueueCreate(10, sizeof(ST7735Frame));
     xTaskCreate(ST7735::loop, "ST7735_Driver", 30000, nullptr, 1, nullptr);
 }
 
 void ST7735::loop(void *param) {
+
     ST7735 st7735 = ST7735();
     st7735.init(nullptr);
     ST7735Frame frame{};

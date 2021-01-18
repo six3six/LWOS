@@ -10,6 +10,7 @@
 
 class Lib {
 public:
+    static void initDrivers(){};
 };
 
 #endif //LWOS_LIB_H

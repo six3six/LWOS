@@ -9,7 +9,7 @@
 
 #include "drivers/arduino/ST7735.h"
 #include "drivers/arduino/ArduinoSerial.h"
-#include "drivers/arduino/ArduinoButton.h"
+#include "drivers/arduino/ArduinoGPIO.h"
 
 #endif
 #ifdef x86
