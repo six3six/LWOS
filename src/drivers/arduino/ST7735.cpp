@@ -2,7 +2,7 @@
 
 #include "drivers/arduino/ST7735.h"
 
-QueueHandle_t ST7735::queueHandle = xQueueCreate(10, sizeof(ST7735Frame));
+QueueHandle_t ST7735::queueHandle = xQueueCreate(10, sizeof(DisplayFrame_st));
 
 QueueHandle_t ST7735::getQueue() {
     return ST7735::queueHandle;
@@ -16,30 +16,30 @@ void ST7735::loop(void *param) {
 
     ST7735 st7735 = ST7735();
     st7735.init(nullptr);
-    ST7735Frame frame{};
+    DisplayFrame_st frame{};
     while (true) {
         if (xQueueReceive(ST7735::queueHandle, &frame, 1000)) {
             auto *intdata = (int32_t *) frame.data;
             switch (frame.command) {
-                case LightControl:
-                    st7735.setBL((int) frame.data[0]);
+                case Display_LightControl:
+                    st7735.setBL(((int *) frame.data)[0]);
                     break;
-                case Rect:
+                case Display_Rect:
                     st7735.screen.drawRect(intdata[0], intdata[1], intdata[2], intdata[3], intdata[4]);
                     break;
-                case FillRect:
+                case Display_FillRect:
                     st7735.screen.fillRect(intdata[0], intdata[1], intdata[2], intdata[3], intdata[4]);
                     break;
-                case Fill:
+                case Display_Fill:
                     st7735.screen.fillScreen(intdata[0]);
                     break;
-                case Circle:
+                case Display_Circle:
                     st7735.screen.drawCircle(intdata[0], intdata[1], intdata[2], intdata[3]);
                     break;
-                case FillCircle:
+                case Display_FillCircle:
                     st7735.screen.fillCircle(intdata[0], intdata[1], intdata[2], intdata[3]);
                     break;
-                case String:
+                case Display_String:
                     st7735.screen.drawString((char *) &intdata[2], intdata[0], intdata[1]);
                     break;
             }

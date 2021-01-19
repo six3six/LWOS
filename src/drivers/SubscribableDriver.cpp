@@ -28,3 +28,11 @@ SubscribableDriver::SubscribableDriver() {
         i = false;
     }
 }
+
+void SubscribableDriver::sendMessage(void *param) {
+    for (int i = 0; i < MAX_QUEUE; ++i) {
+        if (this->subscribedQueueMap[i]) {
+            xQueueSend(this->subscribedQueueHandle[i], param, 0);
+        }
+    }
+}

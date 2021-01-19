@@ -9,21 +9,7 @@
 #include "HW.h"
 #include "TFT_eSPI.h"
 
-enum ST7735Command : short {
-    LightControl,
-    Fill,
-    Rect,
-    FillRect,
-    Circle,
-    FillCircle,
-    String,
-};
 
-struct ST7735Frame {
-    ST7735Command command;
-    size_t length;
-    byte *data;
-};
 
 class ST7735 : public DisplayDriver {
 public:

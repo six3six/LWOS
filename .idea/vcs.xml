@@ -2,7 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/lib/TFT_eSPI" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/lib/esp32_ble_light" vcs="Git" />
   </component>
 </project>

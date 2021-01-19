@@ -11,19 +11,20 @@
 
 class PCF8563 : public RTCDriver {
 public:
-    static void Run(const uint8_t *inputs, size_t input_nb);
+    static void Run();
 
     static QueueHandle_t getQueue();
 
 private:
     [[noreturn]] static void loop(void *param);
 
+    DateTime_st getDateTime();
 
+    DateTime_st getAlarmDateTime();
 
     static QueueHandle_t queueHandle;
 
-
-
+    Rtc_Pcf8563 rtc;
 
 };
 

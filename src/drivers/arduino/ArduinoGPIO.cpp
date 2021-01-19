@@ -47,26 +47,26 @@ void ArduinoGPIO::loop(void *param) {
         if (xQueueReceive(gpio.getQueue(), &frame, 10000)) {
             auto *handle = (QueueHandle_t *) frame.data;
             switch (frame.command) {
-                case ADD_QUEUE:
+                case GPIO_ADD_QUEUE:
 
                     gpio.subscribe(*handle);
                     frame.data = nullptr;
                     break;
-                case REMOVE_QUEUE:
-                    gpio.unsubscribe((QueueHandle_t *) frame.data);
+                case GPIO_REMOVE_QUEUE:
+                    gpio.unsubscribe(*handle);
                     break;
-                case TURN_ON:
+                case GPIO_TURN_ON:
                     digitalWrite(*(uint8_t *) frame.data, HIGH);
                     break;
-                case TURN_OFF:
+                case GPIO_TURN_OFF:
                     digitalWrite(*(uint8_t *) frame.data, LOW);
                     break;
-                case TURN_ON_FOR:
+                case GPIO_TURN_ON_FOR:
                     digitalWrite(((uint8_t *) frame.data)[0], HIGH);
                     vTaskDelay(((uint8_t *) frame.data)[1] / portTICK_PERIOD_MS);
                     digitalWrite(((uint8_t *) frame.data)[0], LOW);
                     break;
-                case TURN_OFF_FOR:
+                case GPIO_TURN_OFF_FOR:
                     digitalWrite(((uint8_t *) frame.data)[0], LOW);
                     vTaskDelay(((uint8_t *) frame.data)[1] / portTICK_PERIOD_MS);
                     digitalWrite(((uint8_t *) frame.data)[0], HIGH);
@@ -107,7 +107,7 @@ ArduinoGPIO::~ArduinoGPIO() {
 
 void IRAM_ATTR ArduinoGPIO::isr(void *param) {
     auto *args = (GPIOInterruptArg_st *) param;
-    for (int i = 0; i < ARD_BTN_MAX_QUEUE; ++i) {
+    for (int i = 0; i < MAX_QUEUE; ++i) {
         if (args->subscribedQueueMap[i]) {
             GPIOInput_st msg{args->pin, digitalRead(args->pin)};
             xQueueSend(args->subscribedQueueHandle[i], &msg, 0);

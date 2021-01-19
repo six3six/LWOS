@@ -8,22 +8,21 @@
 #include "Lib.h"
 #include "drivers/arduino/ArduinoGPIO.h"
 
-#define INPUT_NB 3
+#define INPUT_NB 1
+
+
 constexpr static const uint8_t declared_inputs[INPUT_NB] = {
         TP_PIN_PIN,
-        IMU_INT_PIN,
-        RTC_INT_PIN,
 };
+
+
 class ButtonLib : Lib {
-
-
 public:
-
-    void init();
-
+    static void initDrivers();
     static void createAndSubscribe(QueueHandle_t *handle);
 
 private:
+
 
 
 };

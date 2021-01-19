@@ -9,12 +9,12 @@
 #include "SubscribableDriver.h"
 
 enum GPIOCommand_e : short {
-    ADD_QUEUE,
-    REMOVE_QUEUE,
-    TURN_ON,
-    TURN_OFF,
-    TURN_ON_FOR,
-    TURN_OFF_FOR,
+    GPIO_ADD_QUEUE,
+    GPIO_REMOVE_QUEUE,
+    GPIO_TURN_ON,
+    GPIO_TURN_OFF,
+    GPIO_TURN_ON_FOR,
+    GPIO_TURN_OFF_FOR,
 };
 
 struct GPIOFrame_st {

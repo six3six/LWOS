@@ -10,6 +10,22 @@
 
 typedef uint32_t color;
 
+enum DisplayCommand_e : short {
+    Display_LightControl,
+    Display_Fill,
+    Display_Rect,
+    Display_FillRect,
+    Display_Circle,
+    Display_FillCircle,
+    Display_String,
+};
+
+struct DisplayFrame_st {
+    DisplayCommand_e command;
+    size_t length;
+    void *data;
+};
+
 class DisplayDriver : public Driver {
 
 public:

@@ -9,7 +9,7 @@ void UILib::ChangeLightMode(int32_t mode) {
 
     int *coord = (int32_t *) malloc(coordSize);
     *coord = mode;
-    ST7735Frame frame{ST7735Command::LightControl, coordSize, (byte *) coord};
+    DisplayFrame_st frame{DisplayCommand_e::Display_LightControl, coordSize, (byte *) coord};
     xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
 }
 
@@ -23,7 +23,7 @@ void UILib::DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color) 
     coord[2] = w;
     coord[3] = h;
     coord[4] = color;
-    ST7735Frame frame{ST7735Command::Rect, coordSize, (byte *) coord};
+    DisplayFrame_st frame{DisplayCommand_e::Display_Rect, coordSize, (byte *) coord};
     xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
 }
 
@@ -32,7 +32,7 @@ void UILib::Clear() {
     int *coord = (int32_t *) malloc(coordSize);
     *coord = ST7735_BLACK;
 
-    ST7735Frame frame{ST7735Command::Fill, coordSize, (byte *) coord};
+    DisplayFrame_st frame{DisplayCommand_e::Display_Fill, coordSize, (byte *) coord};
     xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
 }
 
@@ -43,10 +43,24 @@ void UILib::DrawString(int32_t x, int32_t y, const char *text) {
     coord[1] = y;
     strcpy((char *) &coord[2], text);
 
-    ST7735Frame frame{ST7735Command::String, coordSize, (byte *) coord};
+    DisplayFrame_st frame{DisplayCommand_e::Display_String, coordSize, (byte *) coord};
     xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
 }
 
 void UILib::initDrivers() {
     ST7735::Run();
+}
+
+void UILib::DrawFillSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color) {
+
+    size_t coordSize = sizeof(int32_t) * 5;
+
+    int *coord = (int32_t *) malloc(coordSize);
+    coord[0] = x;
+    coord[1] = y;
+    coord[2] = w;
+    coord[3] = h;
+    coord[4] = color;
+    DisplayFrame_st frame{DisplayCommand_e::Display_FillRect, coordSize, (byte *) coord};
+    xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
 }

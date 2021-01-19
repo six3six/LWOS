@@ -19,6 +19,8 @@ public:
 
     void unsubscribe(QueueHandle_t handle);
 
+    void sendMessage(void *);
+
 protected:
     QueueHandle_t subscribedQueueHandle[MAX_QUEUE]{};
     bool subscribedQueueMap[MAX_QUEUE]{};

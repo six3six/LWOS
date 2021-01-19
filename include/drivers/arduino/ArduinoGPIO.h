@@ -11,10 +11,6 @@
 #include "Arduino.h"
 #include "../SubscribableDriver.h"
 
-#define ARD_BTN_MAX_QUEUE 10
-
-
-
 class ArduinoGPIO : public GPIODriver {
 public:
     explicit ArduinoGPIO(const uint8_t inputs[], size_t input_size);
