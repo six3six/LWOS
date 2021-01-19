@@ -13,14 +13,14 @@ class UILib : Lib {
 public:
     static void initDrivers();
 
-    static void DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color);
+    static void DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color, TickType_t wait = 0);
 
-    static void DrawFillSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color);
+    static void DrawFillSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color, TickType_t wait = 0);
 
 
-    static void DrawString(int32_t x, int32_t y, const char *text);
+    static void DrawString(int32_t x, int32_t y, const char *text, TickType_t wait = 0);
 
-    static void Clear();
+    static void Clear( TickType_t wait = 0);
 
     static void ChangeLightMode(int32_t mode);
 

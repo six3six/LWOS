@@ -7,6 +7,8 @@
 
 #include "FreeRTOS.h"
 
+#define DRIVER_TASK_PRIORITY 10
+
 class Driver {
 public:
 

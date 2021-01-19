@@ -27,7 +27,13 @@ public:
 
     static void clearAlarm();
 
+    static String int2number(int val, int nb);
+
+    static String weekdayToString(Weekday_e);
+
+
 private:
+
 
 };
 

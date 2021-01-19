@@ -25,7 +25,7 @@ void ArduinoGPIO::Run(const uint8_t *inputs, size_t input_nb) {
     memcpy(param->inputs, inputs, length);
 
 
-    xTaskCreate(loop, "ArduinoGPIO_Driver", 5000, (void *) param, 1, nullptr);
+    xTaskCreate(loop, "ArduinoGPIO_Driver", 5000, (void *) param, DRIVER_TASK_PRIORITY, nullptr);
 }
 
 QueueHandle_t ArduinoGPIO::getQueue() {

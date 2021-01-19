@@ -9,17 +9,18 @@
 #include "SubscribableDriver.h"
 
 enum Weekday_e : uint8_t {
+
+    SUNDAY,
     MONDAY,
     TUESDAY,
     WEDNESDAY,
     THURSDAY,
     FRIDAY,
     SATURDAY,
-    SUNDAY,
 };
 
 struct DateTime_st {
-    uint8_t year;
+    uint16_t year;
     uint8_t month;
     uint8_t day;
     uint8_t hour;

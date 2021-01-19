@@ -9,7 +9,7 @@
 QueueHandle_t PCF8563::queueHandle = xQueueCreate(10, sizeof(RTCDriverFrame_st));
 
 void PCF8563::Run() {
-    xTaskCreate(loop, "PCF8563Driver", 3000, nullptr, 1, nullptr);
+    xTaskCreate(loop, "PCF8563Driver", 3000, nullptr, DRIVER_TASK_PRIORITY, nullptr);
 }
 
 
@@ -49,8 +49,8 @@ void PCF8563::loop(void *param) {
                     pcf8563.rtc.clearAlarm();
                     break;
                 case RTC_SET_DATE:
-                    pcf8563.rtc.setDateTime(date->day, date->weekday, date->month, true, date->year, date->hour,
-                                            date->minute, date->second);
+                    pcf8563.rtc.setDateTime(date->day, date->weekday, date->month, date->year < 2000, date->year % 100,
+                                            date->hour, date->minute, date->second);
                     break;
                 case RTC_GET_DATE:
                     frm = RTCDriverCallbackFrame_st{
@@ -72,8 +72,10 @@ QueueHandle_t PCF8563::getQueue() {
 
 DateTime_st PCF8563::getDateTime() {
     rtc.getDateTime();
+    int century = 2000;
+    if (rtc.getCentury()) century = 1900;
     return DateTime_st{
-            rtc.getYear(),
+            (uint16_t) (rtc.getYear() + century),
             rtc.getMonth(),
             rtc.getDay(),
             rtc.getHour(),

@@ -9,7 +9,7 @@ QueueHandle_t ST7735::getQueue() {
 }
 
 void ST7735::Run() {
-    xTaskCreate(ST7735::loop, "ST7735_Driver", 30000, nullptr, 1, nullptr);
+    xTaskCreate(ST7735::loop, "ST7735_Driver", 30000, nullptr, DRIVER_TASK_PRIORITY, nullptr);
 }
 
 void ST7735::loop(void *param) {

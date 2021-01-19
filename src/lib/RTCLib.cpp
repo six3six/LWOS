@@ -67,3 +67,36 @@ void RTCLib::clearAlarm() {
     xQueueSend(PCF8563::getQueue(), (void *) &frame, 10000);
 }
 
+String RTCLib::int2number(int val, int nb) {
+    String ret;
+    for (int i = nb - 1; i > 0; --i) {
+        if (val < pow(10, i)) {
+            ret += "0";
+        }
+    }
+
+    ret += val;
+    return ret;
+}
+
+String RTCLib::weekdayToString(Weekday_e weekday) {
+    switch (weekday) {
+
+        case MONDAY:
+            return "Monday";
+        case TUESDAY:
+            return "Tuesday";
+        case WEDNESDAY:
+            return "Wednesday";
+        case THURSDAY:
+            return "Thursday";
+        case FRIDAY:
+            return "Friday";
+        case SATURDAY:
+            return "Saturday";
+        case SUNDAY:
+            return "Sunday";
+    }
+    return "";
+}
+

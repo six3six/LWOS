@@ -14,7 +14,7 @@ void UILib::ChangeLightMode(int32_t mode) {
 }
 
 
-void UILib::DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color) {
+void UILib::DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color, TickType_t wait) {
     size_t coordSize = sizeof(int32_t) * 5;
 
     int *coord = (int32_t *) malloc(coordSize);
@@ -24,19 +24,19 @@ void UILib::DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color) 
     coord[3] = h;
     coord[4] = color;
     DisplayFrame_st frame{DisplayCommand_e::Display_Rect, coordSize, (byte *) coord};
-    xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
+    xQueueSend(ST7735::getQueue(), (void *) &frame, wait);
 }
 
-void UILib::Clear() {
+void UILib::Clear(TickType_t wait) {
     size_t coordSize = sizeof(int32_t) * 5;
     int *coord = (int32_t *) malloc(coordSize);
     *coord = ST7735_BLACK;
 
     DisplayFrame_st frame{DisplayCommand_e::Display_Fill, coordSize, (byte *) coord};
-    xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
+    xQueueSend(ST7735::getQueue(), (void *) &frame, wait);
 }
 
-void UILib::DrawString(int32_t x, int32_t y, const char *text) {
+void UILib::DrawString(int32_t x, int32_t y, const char *text, TickType_t wait) {
     size_t coordSize = sizeof(int32_t) * 2 + sizeof(char) * strlen(text) + 1;
     int *coord = (int32_t *) malloc(coordSize);
     coord[0] = x;
@@ -44,14 +44,14 @@ void UILib::DrawString(int32_t x, int32_t y, const char *text) {
     strcpy((char *) &coord[2], text);
 
     DisplayFrame_st frame{DisplayCommand_e::Display_String, coordSize, (byte *) coord};
-    xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
+    xQueueSend(ST7735::getQueue(), (void *) &frame, wait);
 }
 
 void UILib::initDrivers() {
     ST7735::Run();
 }
 
-void UILib::DrawFillSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color) {
+void UILib::DrawFillSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color, TickType_t wait) {
 
     size_t coordSize = sizeof(int32_t) * 5;
 
@@ -62,5 +62,5 @@ void UILib::DrawFillSquare(int32_t x, int32_t y, int32_t w, int32_t h, color col
     coord[3] = h;
     coord[4] = color;
     DisplayFrame_st frame{DisplayCommand_e::Display_FillRect, coordSize, (byte *) coord};
-    xQueueSend(ST7735::getQueue(), (void *) &frame, 0);
+    xQueueSend(ST7735::getQueue(), (void *) &frame, wait);
 }
