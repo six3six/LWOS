@@ -1,6 +1,8 @@
 #include "lib/UILib.h"
 #include "lib/ButtonLib.h"
 #include "lib/RTCLib.h"
+#include "DaemonRegister.h"
+#include "daemon/BLDaemon.h"
 #include "WiFi.h"
 
 
@@ -17,22 +19,6 @@
         Serial.print("%");
         Serial.println();
         vTaskDelay(10000);
-    }
-}
-
-[[noreturn]] void button_check(void *param) {
-    QueueHandle_t handle;
-    ButtonLib::createAndSubscribe(&handle);
-    GPIOInput_st buff{};
-    while (true) {
-        if (xQueueReceive(handle, &buff, 10000)) {
-            if (buff.pin == TP_PIN_PIN && buff.state == HIGH) {
-                UILib::ChangeLightMode(HIGH);
-                vTaskDelay(5000 / portTICK_PERIOD_MS);
-                UILib::ChangeLightMode(LOW);
-                while (xQueueReceive(handle, &buff, 0));
-            }
-        }
     }
 }
 
@@ -69,6 +55,19 @@
     }
 }
 
+void initDrivers() {
+    UILib::initDrivers();
+    UILib::ChangeLightMode(LOW);
+    ButtonLib::initDrivers();
+    RTCLib::initDrivers();
+}
+
+void initDaemons() {
+    DaemonRegister::AddDaemon(new BLDaemon());
+
+    DaemonRegister::StartDaemons();
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting");
@@ -76,20 +75,17 @@ void setup() {
     pinMode(TP_PWR_PIN, PULLUP);
     digitalWrite(TP_PWR_PIN, HIGH);
 
+    initDrivers();
+    initDaemons();
+
     if (DEBUG && Serial.availableForWrite()) {
         xTaskCreate(heap_check, "HeapCheckProcess", 2000, nullptr, 1, nullptr);
     }
-    UILib::initDrivers();
-    ButtonLib::initDrivers();
-    RTCLib::initDrivers();
 
 
-    UILib::ChangeLightMode(LOW);
     UILib::DrawSquare(10, 10, 10, 10, ST7735_BLUE);
     UILib::DrawString(30, 30, "OK !");
 
-
-    xTaskCreate(button_check, "button_check", 2000, nullptr, 1, nullptr);
     xTaskCreate(rtc_check, "rtc_check", 2000, nullptr, 1, nullptr);
 
     WiFi.begin("LiveboxADE", "Arnaud77420");
