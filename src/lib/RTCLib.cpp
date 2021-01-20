@@ -100,3 +100,11 @@ String RTCLib::weekdayToString(Weekday_e weekday) {
     return "";
 }
 
+void RTCLib::syncToSystem() {
+    RTCDriverFrame_st frame{
+            RTCDriverCommand_e::RTC_SYNC_TO_SYSTEM,
+            nullptr
+    };
+    xQueueSend(PCF8563::getQueue(), (void *) &frame, 10000);
+}
+

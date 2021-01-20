@@ -38,6 +38,7 @@ enum RTCDriverCommand_e {
     RTC_CLEAR_ALARM,
     RTC_SET_DATE,
     RTC_GET_DATE,
+    RTC_SYNC_TO_SYSTEM,
 };
 
 

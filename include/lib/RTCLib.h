@@ -6,7 +6,7 @@
 #define LWOS_RTCLIB_H
 
 #include "Lib.h"
-#include "drivers/arduino/PCF8563.h"
+#include "drivers/arduino/DRVPCF8563.h"
 
 
 class RTCLib : public Lib {
@@ -26,6 +26,8 @@ public:
     static void enableAlarm();
 
     static void clearAlarm();
+
+    static void syncToSystem();
 
     static String int2number(int val, int nb);
 

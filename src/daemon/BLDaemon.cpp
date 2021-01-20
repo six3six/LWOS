@@ -13,6 +13,7 @@ void BLDaemon::Run() {
     QueueHandle_t handle;
     ButtonLib::createAndSubscribe(&handle);
     GPIOInput_st buff{};
+    UILib::ChangeLightMode(HIGH);
     while (true) {
         if (xQueueReceive(handle, &buff, 10000)) {
             if (buff.pin == TP_PIN_PIN && buff.state == HIGH) {

@@ -4,7 +4,7 @@
 
 #ifdef ARDUINO
 
-#include "drivers/arduino/PCF8563.h"
+#include "drivers/arduino/DRVPCF8563.h"
 
 QueueHandle_t PCF8563::queueHandle = xQueueCreate(10, sizeof(RTCDriverFrame_st));
 
@@ -19,7 +19,12 @@ void PCF8563::loop(void *param) {
     PCF8563 pcf8563;
 
     RTCDriverCallbackFrame_st frm{};
-
+    pcf8563.rtc.begin();
+    pcf8563.rtc.disableAlarm();
+    pcf8563.rtc.resetAlarm();
+    pcf8563.rtc.disableCLK();
+    pcf8563.rtc.disableTimer();
+    pcf8563.rtc.check();
 
     while (true) {
         if (xQueueReceive(getQueue(), &frame, 1000)) {
@@ -33,7 +38,7 @@ void PCF8563::loop(void *param) {
                     pcf8563.unsubscribe(*(QueueHandle_t *) frame.data);
                     break;
                 case RTC_SET_ALARM:
-                    pcf8563.rtc.setAlarm(date->minute, date->hour, date->day, date->weekday);
+                    pcf8563.rtc.setAlarm(date->hour, date->minute, date->day, date->weekday);
                     break;
                 case RTC_GET_ALARM:
                     frm = RTCDriverCallbackFrame_st{
@@ -46,11 +51,10 @@ void PCF8563::loop(void *param) {
                     pcf8563.rtc.enableAlarm();
                     break;
                 case RTC_CLEAR_ALARM:
-                    pcf8563.rtc.clearAlarm();
+                    pcf8563.rtc.disableAlarm();
                     break;
                 case RTC_SET_DATE:
-                    pcf8563.rtc.setDateTime(date->day, date->weekday, date->month, date->year < 2000, date->year % 100,
-                                            date->hour, date->minute, date->second);
+                    pcf8563.rtc.setDateTime(date->year, date->month, date->day, date->hour, date->minute, date->second);
                     break;
                 case RTC_GET_DATE:
                     frm = RTCDriverCallbackFrame_st{
@@ -59,6 +63,8 @@ void PCF8563::loop(void *param) {
                     };
                     pcf8563.sendMessage(&frm);
                     break;
+                case RTC_SYNC_TO_SYSTEM:
+                    pcf8563.rtc.syncToSystem();
             }
         }
     }
@@ -71,30 +77,28 @@ QueueHandle_t PCF8563::getQueue() {
 }
 
 DateTime_st PCF8563::getDateTime() {
-    rtc.getDateTime();
-    int century = 2000;
-    if (rtc.getCentury()) century = 1900;
+    RTC_Date date = rtc.getDateTime();
     return DateTime_st{
-            (uint16_t) (rtc.getYear() + century),
-            rtc.getMonth(),
-            rtc.getDay(),
-            rtc.getHour(),
-            rtc.getMinute(),
-            rtc.getSecond(),
-            (Weekday_e) rtc.getWeekday(),
+            date.year,
+            date.month,
+            date.day,
+            date.hour,
+            date.minute,
+            date.second,
+            (Weekday_e) rtc.getDayOfWeek(date.day, date.month, date.year),
     };
 }
 
 DateTime_st PCF8563::getAlarmDateTime() {
-    rtc.getAlarm();
+    RTC_Alarm date = rtc.getAlarm();
     return DateTime_st{
             0,
             0,
-            rtc.getAlarmDay(),
-            rtc.getAlarmHour(),
-            rtc.getAlarmMinute(),
+            date.day,
+            date.hour,
+            date.minute,
             0,
-            (Weekday_e) rtc.getAlarmWeekday(),
+            (Weekday_e) date.weekday,
     };
 }
 
