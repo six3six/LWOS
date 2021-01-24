@@ -6,7 +6,7 @@
 #include "daemon/BLDaemon.h"
 #include "WiFi.h"
 #include <ArduinoOTA.h>
-
+#include <lib/OTALib.h>
 
 #define DEBUG false
 
@@ -31,7 +31,7 @@ int vref = 1100;
 
 float getVoltage() {
     uint16_t v = analogRead(BATT_ADC_PIN);
-    return ((float) v / 4095.0) * 2.0 * 3.3 * (1100 / 1000.0);
+    return ((float) v / 4095.0f) * 2.0f * 3.3f * (1100 / 1000.0f);
 }
 
 uint8_t calcPercentage(float volts) {
@@ -49,8 +49,12 @@ uint8_t calcPercentage(float volts) {
     QueueHandle_t handle;
     RTCLib::createAndSubscribe(&handle);
 
-    tm current_date{INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX};
-    tm prev_date{INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX};
+    tm current_date{};
+    tm prev_date{INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX};
+
+    timeval tv{};
+    timezone tz{};
+
     UILib::DrawString(20, 20, "/", 1000);
     UILib::DrawString(50, 20, "/", 1000);
     UILib::DrawString(20, 40, ":", 1000);
@@ -58,55 +62,75 @@ uint8_t calcPercentage(float volts) {
 
     pinMode(CHARGE_PIN, INPUT_PULLUP);
 
-    int voltage_take;
-    float voltage_mean;
+    int voltage_take = 0;
+    float voltage_mean = 0;
 
+    int timeout = 10000;
+
+    // int i = 0;
     while (true) {
-        getLocalTime(&current_date);
+        /*
+        if (i % 10 == 0) {
+            RTCLib::syncToSystem();
+        }
+        i++;
+        RTCLib::triggerDate();
+        RTCDriverCallbackFrame_st cb{};
+        if (xQueueReceive(handle, &cb, 100 / portTICK_PERIOD_MS)) {
+            if (cb.lowVoltage) {
+                UILib::DrawString(110, 110, "LV");
+            } else {
+                UILib::DrawString(110, 0, "HV");
+            }
+        }*/
+        gettimeofday(&tv, &tz);
+        current_date = *localtime(&tv.tv_sec);
         if (prev_date.tm_wday != current_date.tm_wday) {
-            UILib::DrawFillSquare(0, 0, 210, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(0, 0, RTCLib::weekdayToString((Weekday_e) current_date.tm_wday).c_str(), 1000);
+            UILib::DrawFillSquare(0, 0, 210, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(0, 0, RTCLib::weekdayToString((Weekday_e) current_date.tm_wday).c_str(),
+                              timeout / portTICK_PERIOD_MS);
         }
 
         if (prev_date.tm_mday != current_date.tm_mday) {
-            UILib::DrawFillSquare(0, 20, 23, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(0, 20, RTCLib::int2number(current_date.tm_mday, 2).c_str(), 1000);
+            UILib::DrawFillSquare(0, 20, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(0, 20, RTCLib::int2number(current_date.tm_mday, 2).c_str(), timeout / portTICK_PERIOD_MS);
         }
 
         if (prev_date.tm_mon != current_date.tm_mon) {
-            UILib::DrawFillSquare(30, 20, 23, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(30, 20, RTCLib::int2number(current_date.tm_mon + 1, 2).c_str(), 1000);
+            UILib::DrawFillSquare(30, 20, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(30, 20, RTCLib::int2number(current_date.tm_mon + 1, 2).c_str(),
+                              timeout / portTICK_PERIOD_MS);
         }
 
         if (prev_date.tm_year != current_date.tm_year) {
-            UILib::DrawFillSquare(60, 20, 50, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(60, 20, RTCLib::int2number(current_date.tm_year + 1900, 4).c_str(), 1000);
+            UILib::DrawFillSquare(60, 20, 50, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(60, 20, RTCLib::int2number(current_date.tm_year + 1900, 4).c_str(),
+                              timeout / portTICK_PERIOD_MS);
         }
 
         if (prev_date.tm_hour != current_date.tm_hour) {
-            UILib::DrawFillSquare(0, 40, 23, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(0, 40, RTCLib::int2number(current_date.tm_hour, 2).c_str(), 1000);
+            UILib::DrawFillSquare(0, 40, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(0, 40, RTCLib::int2number(current_date.tm_hour, 2).c_str(), timeout / portTICK_PERIOD_MS);
         }
 
         if (prev_date.tm_min != current_date.tm_min) {
-            UILib::DrawFillSquare(30, 40, 23, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(30, 40, RTCLib::int2number(current_date.tm_min, 2).c_str(), 1000);
+            UILib::DrawFillSquare(30, 40, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(30, 40, RTCLib::int2number(current_date.tm_min, 2).c_str(), timeout / portTICK_PERIOD_MS);
         }
 
         if (prev_date.tm_sec != current_date.tm_sec) {
-            UILib::DrawFillSquare(60, 40, 23, 20, ST7735_BLACK, 1000);
-            UILib::DrawString(60, 40, RTCLib::int2number(current_date.tm_sec, 2).c_str(), 1000);
+            UILib::DrawFillSquare(60, 40, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
+            UILib::DrawString(60, 40, RTCLib::int2number(current_date.tm_sec, 2).c_str(), timeout / portTICK_PERIOD_MS);
         }
-
         if (voltage_take < 3) {
             voltage_take++;
             voltage_mean += getVoltage();
         } else {
-            UILib::DrawFillSquare(90, 40, 60, 20, ST7735_BLACK, 1000);
+            UILib::DrawFillSquare(90, 40, 60, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
             UILib::DrawString(90, 40,
                               (RTCLib::int2number(calcPercentage(voltage_mean / (float) voltage_take), 2) +
-                               "%").c_str(), 1000);
-            if(digitalRead(CHARGE_PIN) == LOW){
+                               "%").c_str(), timeout / portTICK_PERIOD_MS);
+            if (digitalRead(CHARGE_PIN) == LOW) {
                 UILib::DrawString(140, 40, "C");
             }
             voltage_take = 0;
@@ -114,21 +138,22 @@ uint8_t calcPercentage(float volts) {
         }
 
 
-        getLocalTime(&prev_date);
+        gettimeofday(&tv, &tz);
+        prev_date = *localtime(&tv.tv_sec);
 
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
-void initDrivers() {
+IRAM_ATTR void initDrivers() {
     UILib::initDrivers();
     ButtonLib::initDrivers();
     RTCLib::initDrivers();
+    //OTALib::initDrivers();
 }
 
-void initDaemons() {
-    DaemonRegister::AddDaemon(new BLDaemon());
+IRAM_ATTR void initDaemons() {
+    //DaemonRegister::AddDaemon(new BLDaemon());
 
     DaemonRegister::StartDaemons();
 }
@@ -157,13 +182,43 @@ void reachNTP() {
     }
 }
 
+void scanI2Cdevice() {
+    uint8_t err, addr;
+    int nDevices = 0;
+    for (addr = 1; addr < 127; addr++) {
+        Wire.beginTransmission(addr);
+        err = Wire.endTransmission();
+        if (err == 0) {
+            Serial.print("I2C device found at address 0x");
+            if (addr < 16)
+                Serial.print("0");
+            Serial.print(addr, HEX);
+            Serial.println(" !");
+            nDevices++;
+        } else if (err == 4) {
+            Serial.print("Unknow error at address 0x");
+            if (addr < 16)
+                Serial.print("0");
+            Serial.println(addr, HEX);
+        }
+    }
+    if (nDevices == 0)
+        Serial.println("No I2C devices found\n");
+    else
+        Serial.println("Done\n");
+}
+
 IRAM_ATTR void setup() {
     Serial.begin(115200);
     Serial.println("Starting");
 
+    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+    Wire.setClock(400000);
+
+    scanI2Cdevice();
+
     pinMode(LED_PIN, OUTPUT);
     //digitalWrite(LED_PIN, HIGH);
-
 
     pinMode(TP_PWR_PIN, PULLUP);
     digitalWrite(TP_PWR_PIN, HIGH);
@@ -175,30 +230,35 @@ IRAM_ATTR void setup() {
     xTaskCreate(heap_check, "HeapCheckProcess", 2000, nullptr, 1, nullptr);
 #endif
 
+    Serial.println("Running EnergyManager");
     EnergyManager::Run();
+    Serial.println("Syncing RTC to system");
+    RTCLib::syncToSystem();
 
+    Serial.println("Creating RTC_CHECK");
+    xTaskCreate(rtc_check, "rtc_check", 2000, nullptr, 1, nullptr);
     xTaskCreate(rtc_check, "rtc_check", 2000, nullptr, 1, nullptr);
 
+    Serial.println("Connecting");
     WiFi.begin("LiveboxADE", "Arnaud77420");
-    UILib::DrawFillSquare(0, 60, 300, 20, ST7735_BLACK);
-    UILib::DrawString(0, 60, "Connexion...");
     while (WiFi.status() != WL_CONNECTED) {
-        vTaskDelay(1000);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        if (WiFi.status() == WL_CONNECT_FAILED) ESP.restart();
     }
 
+    Serial.println("Wifi connected");
 
-    UILib::DrawFillSquare(0, 60, 300, 20, ST7735_BLACK);
+    configTime(3600, 3600, "pool.ntp.org");
 
 
-    String ip = WiFi.localIP().toString();
-    UILib::DrawString(0, 60, ip.c_str(), 10000);
+    tm t{};
+    if (getLocalTime(&t)) {
+        RTCLib::syncFromSystem();
+    }
 
-    reachNTP();
-    ArduinoOTA.begin();
 }
 
 void loop() {
-    ArduinoOTA.handle();
-    vTaskDelay(500);
+    vTaskDelay(portMAX_DELAY);
 }
 

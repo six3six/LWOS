@@ -39,6 +39,8 @@ enum RTCDriverCommand_e {
     RTC_SET_DATE,
     RTC_GET_DATE,
     RTC_SYNC_TO_SYSTEM,
+    RTC_SYNC_FROM_SYSTEM,
+    RTC_SLEEP,
 };
 
 
@@ -50,6 +52,7 @@ struct RTCDriverFrame_st {
 struct RTCDriverCallbackFrame_st {
     bool alarm;
     DateTime_st date;
+    bool lowVoltage;
 };
 
 

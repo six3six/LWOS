@@ -108,3 +108,11 @@ void RTCLib::syncToSystem() {
     xQueueSend(PCF8563::getQueue(), (void *) &frame, 10000);
 }
 
+
+void RTCLib::syncFromSystem() {
+    RTCDriverFrame_st frame{
+            RTCDriverCommand_e::RTC_SYNC_FROM_SYSTEM,
+            nullptr
+    };
+    xQueueSend(PCF8563::getQueue(), (void *) &frame, 10000);
+}

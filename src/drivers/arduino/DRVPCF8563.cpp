@@ -19,12 +19,30 @@ void PCF8563::loop(void *param) {
     PCF8563 pcf8563;
 
     RTCDriverCallbackFrame_st frm{};
-    pcf8563.rtc.begin();
-    pcf8563.rtc.disableAlarm();
-    pcf8563.rtc.resetAlarm();
-    pcf8563.rtc.disableCLK();
-    pcf8563.rtc.disableTimer();
-    pcf8563.rtc.check();
+
+    Serial.println("[PCF8563Driver] Waiting for PCF8563");
+
+    while (!pcf8563.rtc.begin(Wire)) {
+        Serial.println("[PCF8563Driver] Can't begin : retry");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    Serial.println("[PCF8563Driver] responded");
+
+    while (uint8_t err = pcf8563.rtc.disableAlarm() != 0) {
+        Serial.printf("[PCF8563Driver] Can't disable alarm  - err : %d retry\n", err);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+    while (uint8_t err = pcf8563.rtc.disableCLK() != 0) {
+        Serial.printf("[PCF8563Driver] Can't disable clock  - err : %d retry\n", err);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+    while (uint8_t err = pcf8563.rtc.disableTimer() != 0) {
+        Serial.printf("[PCF8563Driver] Can't disable timer - err : %d retry\n", err);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
 
     while (true) {
         if (xQueueReceive(getQueue(), &frame, 1000)) {
@@ -44,6 +62,7 @@ void PCF8563::loop(void *param) {
                     frm = RTCDriverCallbackFrame_st{
                             true,
                             pcf8563.getAlarmDateTime(),
+                            pcf8563.rtc.isVoltageLow()
                     };
                     pcf8563.sendMessage(&frm);
                     break;
@@ -65,6 +84,13 @@ void PCF8563::loop(void *param) {
                     break;
                 case RTC_SYNC_TO_SYSTEM:
                     pcf8563.rtc.syncToSystem();
+                    break;
+                case RTC_SYNC_FROM_SYSTEM:
+                    pcf8563.rtc.syncToRtc();
+                    break;
+                case RTC_SLEEP:
+                    pcf8563.rtc.disableTimer();
+                    break;
             }
         }
     }

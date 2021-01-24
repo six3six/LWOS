@@ -30,7 +30,7 @@ void UILib::DrawSquare(int32_t x, int32_t y, int32_t w, int32_t h, color color, 
 void UILib::Clear(TickType_t wait) {
     size_t coordSize = sizeof(int32_t) * 5;
     int *coord = (int32_t *) malloc(coordSize);
-    *coord = ST7735_BLACK;
+    *coord = DD_BLACK;
 
     DisplayFrame_st frame{DisplayCommand_e::Display_Fill, coordSize, (byte *) coord};
     xQueueSend(ST7735::getQueue(), (void *) &frame, wait);

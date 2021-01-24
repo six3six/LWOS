@@ -9,6 +9,11 @@
 #include "lib/ButtonLib.h"
 #include "DaemonRegister.h"
 #include "ArduinoOTA.h"
+#include "lib/UILib.h"
+
+
+#include <esp_bt.h>
+#include <esp_wifi.h>
 
 #define INACTIVE_STEP_TIME 30000
 #define TOUCHPAD_THRESHOLD 40
@@ -17,11 +22,15 @@ class EnergyManager {
 public:
     static void Run();
 
+    static void lock() { blocked = true; };
+
+    static void unlock() { blocked = false; };
+
 private:
-    static uint8_t step;
     [[noreturn]] static void loop(void *);
 
-    static void touchpad_callback();
+    static uint8_t step;
+    static bool blocked;
 };
 
 

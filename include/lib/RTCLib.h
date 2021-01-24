@@ -28,6 +28,7 @@ public:
     static void clearAlarm();
 
     static void syncToSystem();
+    static void syncFromSystem();
 
     static String int2number(int val, int nb);
 
@@ -35,6 +36,7 @@ public:
 
 
 private:
+
 
 
 };

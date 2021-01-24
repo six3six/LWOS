@@ -16,6 +16,7 @@ void ST7735::loop(void *param) {
 
     ST7735 st7735 = ST7735();
     st7735.init(nullptr);
+
     DisplayFrame_st frame{};
     while (true) {
         if (xQueueReceive(ST7735::queueHandle, &frame, 1000)) {
@@ -42,6 +43,12 @@ void ST7735::loop(void *param) {
                 case Display_String:
                     st7735.screen.drawString((char *) &intdata[2], intdata[0], intdata[1]);
                     break;
+                case Display_FontSize:
+                    st7735.screen.setTextSize(intdata[0]);
+                    break;
+                case Display_FontColor:
+                    st7735.screen.setTextColor(intdata[0]);
+                    break;
             }
             free(frame.data);
         }
@@ -52,6 +59,7 @@ void ST7735::loop(void *param) {
 void ST7735::init(void *param) {
     screen.init();
     screen.setRotation(3);
+    //screen.setSwapBytes(true);
     screen.fillScreen(TFT_BLACK);
     screen.setTextColor(TFT_WHITE);
     screen.setCursor(0, 0);
