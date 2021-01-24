@@ -240,7 +240,7 @@ IRAM_ATTR void setup() {
     xTaskCreate(rtc_check, "rtc_check", 2000, nullptr, 1, nullptr);
 
     Serial.println("Connecting");
-    WiFi.begin("LiveboxADE", "Arnaud77420");
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     while (WiFi.status() != WL_CONNECTED) {
         vTaskDelay(100 / portTICK_PERIOD_MS);
         if (WiFi.status() == WL_CONNECT_FAILED) ESP.restart();
