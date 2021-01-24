@@ -7,6 +7,7 @@
 #include "WiFi.h"
 #include <ArduinoOTA.h>
 #include <lib/OTALib.h>
+#include "config.h"
 
 #define DEBUG false
 
