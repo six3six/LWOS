@@ -2,7 +2,7 @@
 
 #include "drivers/arduino/ST7735.h"
 
-QueueHandle_t ST7735::queueHandle = xQueueCreate(10, sizeof(DisplayFrame_st));
+QueueHandle_t ST7735::queueHandle = xQueueCreate(100, sizeof(DisplayFrame_st));
 
 QueueHandle_t ST7735::getQueue() {
     return ST7735::queueHandle;
@@ -19,7 +19,7 @@ void ST7735::loop(void *param) {
 
     DisplayFrame_st frame{};
     while (true) {
-        if (xQueueReceive(ST7735::queueHandle, &frame, 1000)) {
+        if (xQueueReceive(ST7735::queueHandle, &frame, portMAX_DELAY)) {
             auto *intdata = (int32_t *) frame.data;
             switch (frame.command) {
                 case Display_LightControl:

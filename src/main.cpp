@@ -1,3 +1,6 @@
+
+#include "esp_pm.h"
+
 #include <EnergyManager.h>
 #include "lib/UILib.h"
 #include "lib/ButtonLib.h"
@@ -9,7 +12,9 @@
 #include <lib/OTALib.h>
 #include "config.h"
 
+
 #define DEBUG false
+
 
 [[noreturn]] void heap_check(void *param) {
     while (true) {
@@ -46,7 +51,7 @@ uint8_t calcPercentage(float volts) {
     return percentage;
 }
 
-[[noreturn]] IRAM_ATTR void rtc_check(void *param) {
+[[noreturn]] void rtc_check(void *param) {
     QueueHandle_t handle;
     RTCLib::createAndSubscribe(&handle);
 
@@ -56,17 +61,18 @@ uint8_t calcPercentage(float volts) {
     timeval tv{};
     timezone tz{};
 
-    UILib::DrawString(20, 20, "/", 1000);
-    UILib::DrawString(50, 20, "/", 1000);
-    UILib::DrawString(20, 40, ":", 1000);
-    UILib::DrawString(50, 40, ":", 1000);
+    UILib::changeFontColor(DD_BLUE);
+    UILib::drawString(20, 20, "/", 1000);
+    UILib::drawString(50, 20, "/", 1000);
+    UILib::changeFontColor(DD_RED);
+    UILib::drawString(20, 40, ":", 1000);
+    UILib::drawString(50, 40, ":", 1000);
 
     pinMode(CHARGE_PIN, INPUT_PULLUP);
 
     int voltage_take = 0;
     float voltage_mean = 0;
 
-    int timeout = 10000;
 
     // int i = 0;
     while (true) {
@@ -81,58 +87,57 @@ uint8_t calcPercentage(float volts) {
             if (cb.lowVoltage) {
                 UILib::DrawString(110, 110, "LV");
             } else {
-                UILib::DrawString(110, 0, "HV");
+                UILib::drawString(110, 0, "HV");
             }
         }*/
         gettimeofday(&tv, &tz);
         current_date = *localtime(&tv.tv_sec);
+        UILib::changeFontColor(DD_BLUE);
         if (prev_date.tm_wday != current_date.tm_wday) {
-            UILib::DrawFillSquare(0, 0, 210, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(0, 0, RTCLib::weekdayToString((Weekday_e) current_date.tm_wday).c_str(),
-                              timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(0, 0, 210, 20, DD_BLACK);
+            UILib::drawString(0, 0, RTCLib::weekdayToString((Weekday_e) current_date.tm_wday).c_str());
         }
 
         if (prev_date.tm_mday != current_date.tm_mday) {
-            UILib::DrawFillSquare(0, 20, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(0, 20, RTCLib::int2number(current_date.tm_mday, 2).c_str(), timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(0, 20, 23, 20, DD_BLACK);
+            UILib::drawString(0, 20, RTCLib::int2number(current_date.tm_mday, 2).c_str());
         }
 
         if (prev_date.tm_mon != current_date.tm_mon) {
-            UILib::DrawFillSquare(30, 20, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(30, 20, RTCLib::int2number(current_date.tm_mon + 1, 2).c_str(),
-                              timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(30, 20, 23, 20, DD_BLACK);
+            UILib::drawString(30, 20, RTCLib::int2number(current_date.tm_mon + 1, 2).c_str());
         }
 
         if (prev_date.tm_year != current_date.tm_year) {
-            UILib::DrawFillSquare(60, 20, 50, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(60, 20, RTCLib::int2number(current_date.tm_year + 1900, 4).c_str(),
-                              timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(60, 20, 50, 20, DD_BLACK);
+            UILib::drawString(60, 20, RTCLib::int2number(current_date.tm_year + 1900, 4).c_str());
         }
-
+        UILib::changeFontColor(DD_RED);
         if (prev_date.tm_hour != current_date.tm_hour) {
-            UILib::DrawFillSquare(0, 40, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(0, 40, RTCLib::int2number(current_date.tm_hour, 2).c_str(), timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(0, 40, 23, 20, DD_BLACK);
+            UILib::drawString(0, 40, RTCLib::int2number(current_date.tm_hour, 2).c_str());
         }
 
         if (prev_date.tm_min != current_date.tm_min) {
-            UILib::DrawFillSquare(30, 40, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(30, 40, RTCLib::int2number(current_date.tm_min, 2).c_str(), timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(30, 40, 23, 20, DD_BLACK);
+            UILib::drawString(30, 40, RTCLib::int2number(current_date.tm_min, 2).c_str());
         }
 
         if (prev_date.tm_sec != current_date.tm_sec) {
-            UILib::DrawFillSquare(60, 40, 23, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(60, 40, RTCLib::int2number(current_date.tm_sec, 2).c_str(), timeout / portTICK_PERIOD_MS);
+            UILib::drawFillRect(60, 40, 23, 20, DD_BLACK);
+            UILib::drawString(60, 40, RTCLib::int2number(current_date.tm_sec, 2).c_str());
         }
         if (voltage_take < 3) {
             voltage_take++;
             voltage_mean += getVoltage();
         } else {
-            UILib::DrawFillSquare(90, 40, 60, 20, DD_BLACK, timeout / portTICK_PERIOD_MS);
-            UILib::DrawString(90, 40,
+            UILib::changeFontColor(DD_WHITE);
+            UILib::drawFillRect(90, 40, 60, 20, DD_BLACK);
+            UILib::drawString(90, 40,
                               (RTCLib::int2number(calcPercentage(voltage_mean / (float) voltage_take), 2) +
-                               "%").c_str(), timeout / portTICK_PERIOD_MS);
+                               "%").c_str());
             if (digitalRead(CHARGE_PIN) == LOW) {
-                UILib::DrawString(140, 40, "C");
+                UILib::drawString(140, 40, "C");
             }
             voltage_take = 0;
             voltage_mean = 0;
@@ -213,6 +218,11 @@ IRAM_ATTR void setup() {
     Serial.begin(115200);
     Serial.println("Starting");
 
+    esp_log_level_set("*", ESP_LOG_ERROR);
+    esp_log_level_set(EnMag_TAG, ESP_LOG_INFO);
+
+    ESP_LOGE ("SETUP", "CpuFrequency : %d", getCpuFrequencyMhz());
+
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
     Wire.setClock(400000);
 
@@ -238,7 +248,6 @@ IRAM_ATTR void setup() {
 
     Serial.println("Creating RTC_CHECK");
     xTaskCreate(rtc_check, "rtc_check", 2000, nullptr, 1, nullptr);
-    xTaskCreate(rtc_check, "rtc_check", 2000, nullptr, 1, nullptr);
 
     Serial.println("Connecting");
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -247,7 +256,10 @@ IRAM_ATTR void setup() {
         if (WiFi.status() == WL_CONNECT_FAILED) ESP.restart();
     }
 
+
     Serial.println("Wifi connected");
+
+    OTALib::initDrivers();
 
     configTime(3600, 3600, "pool.ntp.org");
 

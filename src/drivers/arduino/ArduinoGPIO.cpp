@@ -110,7 +110,7 @@ void IRAM_ATTR ArduinoGPIO::isr(void *param) {
     for (int i = 0; i < MAX_QUEUE; ++i) {
         if (args->subscribedQueueMap[i]) {
             GPIOInput_st msg{args->pin, digitalRead(args->pin)};
-            xQueueSend(args->subscribedQueueHandle[i], &msg, 0);
+            xQueueSendFromISR(args->subscribedQueueHandle[i], &msg, 0);
         }
     }
 }

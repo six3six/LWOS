@@ -13,13 +13,13 @@ void BLDaemon::Run() {
     QueueHandle_t handle;
     ButtonLib::createAndSubscribe(&handle);
     GPIOInput_st buff{};
-    UILib::ChangeLightMode(HIGH);
+    UILib::changeBLMode(HIGH);
     while (true) {
         if (xQueueReceive(handle, &buff, 10000)) {
             if (buff.pin == TP_PIN_PIN && buff.state == HIGH) {
-                UILib::ChangeLightMode(HIGH);
+                UILib::changeBLMode(HIGH);
                 vTaskDelay(5000 / portTICK_PERIOD_MS);
-                UILib::ChangeLightMode(LOW);
+                UILib::changeBLMode(LOW);
                 while (xQueueReceive(handle, &buff, 0));
             }
         }

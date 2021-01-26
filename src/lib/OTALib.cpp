@@ -11,7 +11,7 @@ void OTALib::initDrivers() {
     ArduinoOTA.onStart([]() {
         EnergyManager::lock();
         DaemonRegister::PauseDaemons();
-        UILib::ChangeLightMode(HIGH);
+        UILib::changeBLMode(HIGH);
     });
 
 
@@ -32,7 +32,7 @@ void OTALib::progress(unsigned int progress, unsigned int total) {
     unsigned int percent = (progress / (total / 100));
     String str_percent = String(percent) + "%";
 
-    UILib::Clear(portMAX_DELAY);
-    UILib::DrawString(0, 0, "Updating", portMAX_DELAY);
-    UILib::DrawString(0, 30, str_percent.c_str(), portMAX_DELAY);
+    UILib::clear(portMAX_DELAY);
+    UILib::drawString(0, 0, "Updating", portMAX_DELAY);
+    UILib::drawString(0, 30, str_percent.c_str(), portMAX_DELAY);
 }

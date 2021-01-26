@@ -4,6 +4,7 @@
 
 #include "EnergyManager.h"
 
+
 uint8_t EnergyManager::step = 0;
 bool EnergyManager::blocked = false;
 
@@ -21,21 +22,31 @@ void EnergyManager::Run() {
     while (true) {
         if (!xQueueReceive(btnHandle, &frame, INACTIVE_STEP_TIME / portTICK_PERIOD_MS) && !blocked) {
             if (step == 0) {
-                Serial.println("[EM] Turning off screen");
-                UILib::ChangeLightMode(LOW);
+                ESP_LOGI(EnMag_TAG, "Turning off screen");
+                UILib::changeBLMode(LOW);
+
+                ESP_LOGI(EnMag_TAG, "Reduce CPU freq");
+                setCpuFrequencyMhz(80);
             } else if (step == 1) {
-                Serial.println("[EM] Modem sleep mode");
+                ESP_LOGI(EnMag_TAG, "Modem off");
                 esp_bt_controller_disable();
-                //esp_wifi_stop();
+                WiFi.disconnect();
+                WiFi.mode(WIFI_OFF);
+                esp_wifi_stop();
+                esp_bt_controller_disable();
+                btStop();
             }
             step++;
         } else if (step != 0) {
-            //esp_wifi_start();
-            Serial.println("[EM] Restarting all process");
-            UILib::ChangeLightMode(HIGH);
+            ESP_LOGI(EnMag_TAG, "Restart WiFi");
+            WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+            ESP_LOGI(EnMag_TAG, "Increase frequency");
+            setCpuFrequencyMhz(240);
+            ESP_LOGI(EnMag_TAG, "Turning on screen");
+            UILib::changeBLMode(HIGH);
             step = 0;
         } else {
-            UILib::ChangeLightMode(HIGH);
+            UILib::changeBLMode(HIGH);
         }
 
     }

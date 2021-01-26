@@ -10,7 +10,6 @@
 #include "TFT_eSPI.h"
 
 
-
 class ST7735 : public DisplayDriver {
 public:
 
@@ -21,7 +20,6 @@ public:
     void init(void *) override;
 
     void drawPixel(int x, int y, color c) override;
-
 
     void setBL(int bl_mode) const;
 

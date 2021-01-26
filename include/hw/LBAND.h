@@ -3,6 +3,7 @@
 //
 
 #include "WString.h"
+#include "esp_log.h"
 
 
 #define TP_PIN_PIN          33
