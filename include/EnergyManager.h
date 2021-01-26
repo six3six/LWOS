@@ -6,13 +6,13 @@
 #define LWOS_ENERGYMANAGER_H
 
 
-
 #include "FreeRTOS.h"
 #include "lib/ButtonLib.h"
 #include "DaemonRegister.h"
 #include "ArduinoOTA.h"
 #include "lib/UILib.h"
 #include "driver/adc.h"
+#include "ApplicationManager.h"
 
 #include <config.h>
 
@@ -31,6 +31,12 @@ public:
     static void lock() { blocked = true; };
 
     static void unlock() { blocked = false; };
+
+    static float getBatteryVoltage();
+
+    static uint8_t getBatteryPercent();
+
+    static uint8_t getBatteryPercent(float voltage);
 
 private:
     [[noreturn]] static void loop(void *);

@@ -1,13 +1,13 @@
 //
-// Created by ldesp on 19/01/2021.
+// Created by ldesp on 26/01/2021.
 //
 
-#ifndef LWOS_DAEMON_H
-#define LWOS_DAEMON_H
+#ifndef LWOS_APPLICATION_H
+#define LWOS_APPLICATION_H
 
 #include "FreeRTOS.h"
 
-class Daemon {
+class Application {
 public:
 
     virtual void Run() {};
@@ -22,4 +22,4 @@ protected:
     TaskHandle_t taskHandle{};
 };
 
-#endif //LWOS_DAEMON_H
+#endif //LWOS_APPLICATION_H
